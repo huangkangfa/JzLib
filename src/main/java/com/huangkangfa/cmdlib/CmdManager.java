@@ -9,8 +9,9 @@ import com.huangkangfa.cmdlib.enums.EffectiveBit_1;
 import com.huangkangfa.cmdlib.enums.EffectiveBit_4;
 import com.huangkangfa.cmdlib.enums.OD;
 import com.huangkangfa.cmdlib.frame.Frame_Distance;
-import com.huangkangfa.cmdlib.frame.Frame_GatewayWiFi;
 import com.huangkangfa.cmdlib.frame.Frame_GatewayLogin;
+import com.huangkangfa.cmdlib.frame.Frame_GatewayWiFi;
+import com.huangkangfa.cmdlib.frame.Frame_LinkContral;
 import com.huangkangfa.cmdlib.frame.Frame_Modle;
 import com.huangkangfa.cmdlib.index.ChildIndex_Change;
 import com.huangkangfa.cmdlib.index.Index_Change;
@@ -184,8 +185,8 @@ public class CmdManager {
         return cmd.getValue();
     }
 
-    //多路面板联控指令(测试)
-    public static String getCmd_Varied_LinkControl(String gateway_mac, String mac, int num, int startWay, int endWay, String address_mac, String functionId) {
+    //多路面板联控指令 写入
+    public static String getCmd_Write_LinkControl(String gateway_mac, String mac, int num, int startWay, int endWay, String address_mac, String functionId) {
         CmdObj cmd = new CmdObj();
         cmd.setCmdID(CmdID.WRITE);
         cmd.setDstAddrFmtEnum(DstAddrFmtEnum.NODE);
@@ -199,6 +200,39 @@ public class CmdManager {
         cmd.setData(sb.toString());
 
         return cmd.getValue();
+    }
+    //多路面板联控指令  读取
+    public static String getCmd_Read_LinkControl(String gateway_mac,String mac,int num){
+        CmdObj cmd=new CmdObj();
+        cmd.setCmdID(CmdID.READ);
+        cmd.setDstAddrFmtEnum(DstAddrFmtEnum.NODE);
+        cmd.setAddr(new Addr(gateway_mac,mac));
+        cmd.setOD(OD._6003);
+        cmd.setBaseindex(new Index_Constant(DataTypeUtil.decimalToHex(num)));
+        cmd.setData("");
+        return cmd.getValue();
+    }
+    //多路面板解除绑定关系
+    public static String getCmd_Unbing_LinkContral(String gateway_mac,String mac,int num){
+        CmdObj cmd=new CmdObj();
+        cmd.setCmdID(CmdID.WRITE);
+        cmd.setDstAddrFmtEnum(DstAddrFmtEnum.NODE);
+        cmd.setAddr(new Addr(gateway_mac,mac));
+        cmd.setOD(OD._6003);
+        cmd.setBaseindex(new Index_Constant(DataTypeUtil.decimalToHex(num)));
+        cmd.setData("0cffff0000000000000000ffff");
+        return cmd.getValue();
+    }
+    //多路面板联控指令反馈解析
+    public static Frame_LinkContral getCmd_LinkContralFromString(String data){
+        Frame_LinkContral m=new Frame_LinkContral();
+        m.setClientMac(data.substring(6,22));
+        m.setIndex(data.substring(26,28));
+        m.setClientNum(data.substring(30,32));
+        m.setServerNum(data.substring(32,34));
+        m.setServerMac(data.substring(34,50));
+        m.setOthers(data.substring(50,54));
+        return m;
     }
 
     /*************************************** 色温灯(测试) *******************************************/

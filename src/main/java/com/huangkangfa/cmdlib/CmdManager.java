@@ -18,6 +18,7 @@ import com.huangkangfa.cmdlib.index.Index_Change;
 import com.huangkangfa.cmdlib.index.Index_Constant;
 import com.huangkangfa.cmdlib.param.DeviceParam;
 import com.huangkangfa.cmdlib.param.SceneParam;
+import com.huangkangfa.cmdlib.param.scene.LinkType;
 import com.huangkangfa.cmdlib.utils.DataTypeUtil;
 import com.huangkangfa.cmdlib.utils.StringUtil;
 import com.huangkangfa.cmdlib.utils.TimeUtil;
@@ -863,15 +864,15 @@ public class CmdManager {
      * @param startTime 定时时间  2个字节
      * @return
      */
-    public static String[] getSetSceneCommand_ForCJ(List<String> cmds, String mac, String bh, String dh, String time, String startTime) {
+    public static String[] getSetSceneCommand_ForCJ(List<String> cmds, String mac,String bh, String dh, String time, String startTime) {
         CmdObj cmd=new CmdObj();
         cmd.setCmdID(CmdID.RESET);
         cmd.setDstAddrFmtEnum(DstAddrFmtEnum.GATEWAY);
         cmd.setAddr(new Addr(mac));
 
         StringBuilder sb=new StringBuilder();
-        sb.append(SceneParam.PARAM_FLAG_SET).append(SceneParam.PARAM_DEFAULT_NAME).append(SceneParam.PARAM_TYPE_SCENE)
-                .append(bh).append(SceneParam.PARAM_FEATURES_SET).append(DataTypeUtil.decimalToHex(cmds.size())).append(dh)
+        sb.append(SceneParam.SCENECMD.SET).append(SceneParam.DEFAULTNAME).append(SceneParam.SCENETYPE.SCENE)
+                .append(bh).append(SceneParam.SCENECMD.SET).append(DataTypeUtil.decimalToHex(cmds.size())).append(dh)
                 .append(startTime).append("ffffffffffffffffffffffffffffffffffffffffffffffff").append(time);
         cmd.setBaseindex(new Index_Constant("",DataTypeUtil.decimalToHex(sb.toString().length()/2)));
         cmd.setData(sb.toString());
@@ -896,7 +897,7 @@ public class CmdManager {
      * @param cmds
      * @param mac
      * @param bh
-     * @param force     01为强制联动；02为非强制联动
+     * @param linktype     01为强制联动；02为非强制联动
      * @param bcf
      * @param mac2
      * @param channel   数据通道
@@ -907,7 +908,7 @@ public class CmdManager {
      * @param time
      * @return
      */
-    public static String[] getSetSceneCommand_ForLD(List<String> cmds, String mac, String bh, String force, String bcf, String mac2, String channel, String dataType, String compType, String dataDown, String dataUp, String time) {
+    public static String[] getSetSceneCommand_ForLD(List<String> cmds, String mac, String bh, LinkType linktype, String bcf, String mac2, String channel, String dataType, String compType, String dataDown, String dataUp, String time) {
         String[] s = new String[cmds.size() + 1];
         CmdObj cmd=new CmdObj();
         cmd.setCmdID(CmdID.SCENE);
@@ -915,9 +916,9 @@ public class CmdManager {
         cmd.setAddr(new Addr(mac));
 
         StringBuilder sb=new StringBuilder();
-        sb.append(SceneParam.PARAM_FLAG_SET).append(SceneParam.PARAM_DEFAULT_NAME).append(SceneParam.PARAM_TYPE_LINK).append(bh)
-                .append(SceneParam.PARAM_FEATURES_SET).append(DataTypeUtil.decimalToHex(cmds.size())).append("ffffff").append(force)
-                .append(SceneParam.PARAM_LINK_OPEN).append(bcf).append(mac2).append(channel).append(dataType).append(compType)
+        sb.append(SceneParam.SCENECMD.SET).append(SceneParam.DEFAULTNAME).append(SceneParam.SCENETYPE.LINK).append(bh)
+                .append(SceneParam.SCENEFEATURES.SET).append(DataTypeUtil.decimalToHex(cmds.size())).append("ffffff").append(linktype.getVal())
+                .append(SceneParam.LINKSTATE.OPEN).append(bcf).append(mac2).append(channel).append(dataType).append(compType)
                 .append("0018").append(dataDown).append(dataUp).append(time);
         cmd.setBaseindex(new Index_Constant("",DataTypeUtil.decimalToHex(sb.toString().length()/2)));
         cmd.setData(sb.toString());
@@ -948,7 +949,7 @@ public class CmdManager {
         cmd.setDstAddrFmtEnum(DstAddrFmtEnum.GATEWAY);
         cmd.setAddr(new Addr(mac));
         StringBuilder sb=new StringBuilder();
-        sb.append(SceneParam.PARAM_FEATURES_DEL).append(num);
+        sb.append(SceneParam.SCENEFEATURES.DEL).append(num);
         cmd.setBaseindex(new Index_Constant("",DataTypeUtil.decimalToHex(sb.toString().length() / 2)));
         cmd.setData(sb.toString());
         return cmd.getValue();
@@ -966,7 +967,7 @@ public class CmdManager {
         cmd.setDstAddrFmtEnum(DstAddrFmtEnum.GATEWAY);
         cmd.setAddr(new Addr(mac));
         StringBuilder sb=new StringBuilder();
-        sb.append(SceneParam.PARAM_FEATURES_START).append(num);
+        sb.append(SceneParam.SCENEFEATURES.TRIGGER).append(num);
         cmd.setBaseindex(new Index_Constant("",DataTypeUtil.decimalToHex(sb.toString().length()/2)));
         cmd.setData(sb.toString());
         return cmd.getValue();
